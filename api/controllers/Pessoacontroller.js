@@ -41,13 +41,49 @@ class PessoaController {
     static async deletarPessoa(req, res) {
         const { id } = req.params
         try {
-            await dataBase.Pessoas.destroy({ where: {id: Number(id)}})
-            return res.status(201).json({ msg: `Dados excluído com sucesso!`})
+            await dataBase.Pessoas.destroy({ where: { id: Number(id) } })
+            return res.status(201).json({ msg: `Dados excluído com sucesso!` })
+        } catch (error) {
+            return res.status(500).json({ msg: `${error.message}` })
+        }
+    }
+    static async pegaUmaMatricula(req, res) {
+        const { estudanteId, matriculaId } = req.params
+        try {
+            const umaMatricula = await dataBase.Matriculas.findOne(
+                {
+                    where:
+                    {
+                        id: Number(matriculaId),
+                        estudante_id: Number(estudanteId)
+                    }
+                });
+            return res.status(200).json(umaMatricula)
+        } catch (error) {
+            return res.status(500).json({ msg: `${error.message} erro do servidor` })
+        }
+    }
+    static async criarMatricula(req, res) {
+        const {estudanteId} = req.params
+        const novaMatricula = {...req.body, estudante_id: Number(estudanteId)}
+        try {
+            const novaMatriculaCriada = await dataBase.Matriculas.create(novaMatricula)
+            return res.status(201).json(novaMatriculaCriada)
+        } catch (error) {
+            return res.status(500).json({ msg: `${error.message} erro do servidor` })
+        }
+    }
+    static async atualizarMatricula(req, res) {
+        const { id } = req.params
+        const atualizarInfos = req.body
+        try {
+            await dataBase.Pessoas.update(atualizarInfos, { where: { id: Number(id) } })
+            const infosAtualizada = await dataBase.Pessoas.findOne({ where: { id: Number(id) } })
+            return res.status(201).json(infosAtualizada)
         } catch (error) {
             return res.status(500).json({ msg: `${error.message}` })
         }
     }
 }
-
 
 module.exports = PessoaController;
