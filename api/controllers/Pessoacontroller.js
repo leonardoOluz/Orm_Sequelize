@@ -64,8 +64,8 @@ class PessoaController {
         }
     }
     static async criarMatricula(req, res) {
-        const {estudanteId} = req.params
-        const novaMatricula = {...req.body, estudante_id: Number(estudanteId)}
+        const { estudanteId } = req.params
+        const novaMatricula = { ...req.body, estudante_id: Number(estudanteId) }
         try {
             const novaMatriculaCriada = await dataBase.Matriculas.create(novaMatricula)
             return res.status(201).json(novaMatriculaCriada)
@@ -74,12 +74,28 @@ class PessoaController {
         }
     }
     static async atualizarMatricula(req, res) {
-        const { id } = req.params
+        const { estudanteId, matriculaId } = req.params
         const atualizarInfos = req.body
         try {
-            await dataBase.Pessoas.update(atualizarInfos, { where: { id: Number(id) } })
-            const infosAtualizada = await dataBase.Pessoas.findOne({ where: { id: Number(id) } })
-            return res.status(201).json(infosAtualizada)
+            await dataBase.Matriculas.update(atualizarInfos, {
+                where:
+                {
+                    id: Number(matriculaId),
+                    estudante_id: Number(estudanteId)
+                }
+            })
+            const matriculasAtualizada = await dataBase.Matriculas.findOne({ where: { id: Number(matriculaId) } })
+            return res.status(201).json(matriculasAtualizada)
+        } catch (error) {
+            return res.status(500).json({ msg: `${error.message}` })
+        }
+    }
+    static async deletarMatricula(req, res) {
+        const { estudanteid, matriculaId } = req.params
+
+        try {
+            await dataBase.Matriculas.destroy({ where: { id: Number(matriculaId) } })
+            return res.status(201).json({ msg: `Matricula de Id: ${matriculaId} excluído com sucesso!` })
         } catch (error) {
             return res.status(500).json({ msg: `${error.message}` })
         }
