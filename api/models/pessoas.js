@@ -5,7 +5,7 @@ module.exports = (sequelize, DataTypes) => {
     ativo: DataTypes.BOOLEAN,
     email: DataTypes.STRING,
     role: DataTypes.STRING
-  }, {});
+  }, {paranoid: true});
   Pessoas.associate = function(models) {
     // associations can be defined here
     Pessoas.hasMany(models.Turmas,{
