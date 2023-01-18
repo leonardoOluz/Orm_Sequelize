@@ -39,12 +39,21 @@ class TurmasController {
         }
     }
     static async deletarTurmas(req, res) {
-        const {id} = req.params;
+        const { id } = req.params;
         try {
-            await dataBase.Turmas.destroy({where: {id: Number(id)}});
-            return res.status(201).json({msg: `Turmas deletado com sucesso!`})
+            await dataBase.Turmas.destroy({ where: { id: Number(id) } });
+            return res.status(201).json({ msg: `Turmas deletado com sucesso!` })
         } catch (error) {
-            return res.status(500).json({msg: `${error.message}`});
+            return res.status(500).json({ msg: `${error.message}` });
+        }
+    }
+    static async restauraTurma(req, res) {
+        const { id } = req.params
+        try {
+            await dataBase.Turmas.restore({ where: { id: Number(id) } })
+            return res.status(200).json({ mensagem: `id ${id} restaurado` })
+        } catch (error) {
+            return res.status(500).json(error.message)
         }
     }
 }
