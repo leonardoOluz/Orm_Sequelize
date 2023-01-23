@@ -135,13 +135,9 @@ class PessoaController {
         const { estudanteId} = req.params
 
         try {
-            // const matriculas =  await dataBase.Matriculas.findAll({ where: { estudante_id: Number(estudanteid) } })
-
             const pessoa  = await dataBase.Pessoas.findOne({where:{id: Number(estudanteId)}})
-            const matriculas = await pessoa.getAulasMatriculadas() 
-            
+            const matriculas = await pessoa.getAulasMatriculadas()             
             return res.status(201).json(matriculas)
-
         } catch (error) {
             return res.status(500).json({ msg: `${error.message}` })
         }
