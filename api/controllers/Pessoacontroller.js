@@ -1,14 +1,22 @@
 const dataBase = require('../models');
 
 class PessoaController {
-    static async pegaTodasAsPessoas(req, res) {
+    static async pegaPessoasAtivas(req, res) {
         try {
-            const todasAsPessoas = await dataBase.Pessoas.findAll();
-            return res.status(200).json(todasAsPessoas);
+            const pessoasAtivas = await dataBase.Pessoas.findAll();
+            return res.status(200).json(pessoasAtivas);
         } catch (error) {
             return res.status(500).json({ msg: ` ${error.message}Erro no servidor` });
         }
-    }
+    }    
+    static async pegaTodasAsPessoas(req, res) {
+        try {
+            const pessoasAtivas = await dataBase.Pessoas.scope('todos').findAll();
+            return res.status(200).json(pessoasAtivas);
+        } catch (error) {
+            return res.status(500).json({ msg: ` ${error.message}Erro no servidor` });
+        }
+    }    
     static async pegaUmaPessoa(req, res) {
         const { id } = req.params
         try {
@@ -123,7 +131,6 @@ class PessoaController {
             return res.status(500).json(error.message)
         }
     }
-
 }
 
 module.exports = PessoaController;
