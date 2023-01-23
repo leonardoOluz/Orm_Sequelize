@@ -8,7 +8,7 @@ class PessoaController {
         } catch (error) {
             return res.status(500).json({ msg: ` ${error.message}Erro no servidor` });
         }
-    }    
+    }
     static async pegaTodasAsPessoas(req, res) {
         try {
             const pessoasAtivas = await dataBase.Pessoas.scope('todos').findAll();
@@ -16,7 +16,7 @@ class PessoaController {
         } catch (error) {
             return res.status(500).json({ msg: ` ${error.message}Erro no servidor` });
         }
-    }    
+    }
     static async pegaUmaPessoa(req, res) {
         const { id } = req.params
         try {
@@ -129,6 +129,21 @@ class PessoaController {
             return res.status(200).json({ mensagem: `Matricula de id ${matriculaId} restaurado` })
         } catch (error) {
             return res.status(500).json(error.message)
+        }
+    }
+    static async pegaMatriculas(req, res) {
+        const { estudanteId} = req.params
+
+        try {
+            // const matriculas =  await dataBase.Matriculas.findAll({ where: { estudante_id: Number(estudanteid) } })
+
+            const pessoa  = await dataBase.Pessoas.findOne({where:{id: Number(estudanteId)}})
+            const matriculas = await pessoa.getAulasMatriculadas() 
+            
+            return res.status(201).json(matriculas)
+
+        } catch (error) {
+            return res.status(500).json({ msg: `${error.message}` })
         }
     }
 }
