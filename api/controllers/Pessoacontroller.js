@@ -86,13 +86,7 @@ class PessoaController {
         const { estudanteId, matriculaId } = req.params
         const atualizarInfos = req.body
         try {
-            await dataBase.Matriculas.update(atualizarInfos, {
-                where:
-                {
-                    id: Number(matriculaId),
-                    estudante_id: Number(estudanteId)
-                }
-            })
+            await dataBase.Matriculas.update(atualizarInfos, { where: { id: Number(matriculaId), estudante_id: Number(estudanteId) } })
             const matriculasAtualizada = await dataBase.Matriculas.findOne({ where: { id: Number(matriculaId) } })
             return res.status(201).json(matriculasAtualizada)
         } catch (error) {
@@ -133,18 +127,18 @@ class PessoaController {
         }
     }
     static async pegaMatriculas(req, res) {
-        const { estudanteId} = req.params
+        const { estudanteId } = req.params
 
         try {
-            const pessoa  = await dataBase.Pessoas.findOne({where:{id: Number(estudanteId)}})
-            const matriculas = await pessoa.getAulasMatriculadas()             
+            const pessoa = await dataBase.Pessoas.findOne({ where: { id: Number(estudanteId) } })
+            const matriculas = await pessoa.getAulasMatriculadas()
             return res.status(201).json(matriculas)
         } catch (error) {
             return res.status(500).json({ msg: `${error.message}` })
         }
     }
     static async pegaMatriculasPorTurma(req, res) {
-        const { turmaId} = req.params
+        const { turmaId } = req.params
 
         try {
             const todasAsMatriculas = await dataBase.Matriculas.findAndCountAll({
@@ -153,9 +147,9 @@ class PessoaController {
                     status: 'confirmado'
                 },
                 limit: 20,
-                order: [['estudante_id','DESC']]
+                order: [['estudante_id', 'DESC']]
             })
-        return res.status(200).json(todasAsMatriculas)
+            return res.status(200).json(todasAsMatriculas)
 
         } catch (error) {
             return res.status(500).json({ msg: `${error.message}` })
@@ -179,13 +173,19 @@ class PessoaController {
         }
     }
     static async cancelaPessoa(req, res) {
-        const {estudanteId} = req.params;
+        const { estudanteId } = req.params;
+
         try {
-            await dataBase.Pessoas
-            .update({ativo: false}, {where: {id: Number(estudanteId)}})
-            await dataBase.Matriculas
-            .update({status: 'cancelado'}, {where: {estudante_id: Number(estudanteId)}})
-            return res.status(200).json({message: `Matricula ref, estudante ${estudanteId} canceladas`})
+            dataBase.sequelize.transaction(async transacao => {
+
+                await dataBase.Pessoas.update({ ativo: false }, { where: { id: Number(estudanteId) } }, { transaction: transacao })
+
+                await dataBase.Matriculas.update({ status: 'cancelado' }, { where: { estudante_id: Number(estudanteId) } }, { transaction: transacao })
+
+                return res.status(200).json({ message: `Matricula ref. estudante ${estudanteId} canceladas` })
+
+            })
+
         } catch (error) {
             return res.status(500).json({ msg: `${error.message}` })
         }
