@@ -1,3 +1,4 @@
+const Sequelize = require('sequelize');
 const dataBase = require('../models');
 
 class PessoaController {
@@ -138,6 +139,42 @@ class PessoaController {
             const pessoa  = await dataBase.Pessoas.findOne({where:{id: Number(estudanteId)}})
             const matriculas = await pessoa.getAulasMatriculadas()             
             return res.status(201).json(matriculas)
+        } catch (error) {
+            return res.status(500).json({ msg: `${error.message}` })
+        }
+    }
+    static async pegaMatriculasPorTurma(req, res) {
+        const { turmaId} = req.params
+
+        try {
+            const todasAsMatriculas = await dataBase.Matriculas.findAndCountAll({
+                where: {
+                    turma_id: Number(turmaId),
+                    status: 'confirmado'
+                },
+                limit: 20,
+                order: [['estudante_id','DESC']]
+            })
+        return res.status(200).json(todasAsMatriculas)
+
+        } catch (error) {
+            return res.status(500).json({ msg: `${error.message}` })
+        }
+    }
+
+    static async pegaTurmasLotadas(req, res) {
+        const lotacaoTurma = 2;
+
+        try {
+            const turmasLotadas = await dataBase.Matriculas.findAndCountAll({
+                where: {
+                    status: 'confirmado'
+                },
+                attributes: ['turma_id'],
+                group: ['turma_id'],
+                having: Sequelize.literal(`count(turma_id) >= ${lotacaoTurma}`)
+            })
+            res.status(200).json(turmasLotadas.count)
         } catch (error) {
             return res.status(500).json({ msg: `${error.message}` })
         }

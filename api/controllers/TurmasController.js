@@ -1,9 +1,9 @@
 const dataBase = require('../models');
 const Sequelize = require('sequelize');
-const Op =Sequelize.Op;
+const Op = Sequelize.Op;
 
 class TurmasController {
-    static async pegaTodosOsTurmas(req, res) {
+    static async pegaTodosAsTurmas(req, res) {
         const {data_inicial, data_final} = req.query;
         const where = {} 
         data_inicial || data_final ? where.data_inicio = {} : null

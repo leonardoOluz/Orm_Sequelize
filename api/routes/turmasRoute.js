@@ -3,7 +3,7 @@ const TurmasController = require('../controllers/TurmasController');
 
 const router = Router();
 
-router.get('/turmas',TurmasController.pegaTodosOsTurmas)
+router.get('/turmas',TurmasController.pegaTodosAsTurmas)
 router.get('/turmas/:id',TurmasController.pegaUmaTurma)
 router.post('/turmas', TurmasController.criarTurmas)
 router.put('/turmas/:id',TurmasController.atualizarTurmas)
