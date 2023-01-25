@@ -1,59 +1,67 @@
 // const Sequelize = require('sequelize');
 // const dataBase = require('../models');
 
-const Services = require('../services/Services');
-const pessoasServices = new Services('Pessoas')
+const {PessoasServices, MatriculasServices} = require('../services');
+const pessoasServices = new PessoasServices()
+const matriculasServices = new MatriculasServices()
+
 
 class PessoaController {
-    static async pegaPessoasAtivas(req, res) {
-        try {
-            const pessoasAtivas = await pessoasServices.pegaTodosOsRegistros();
-            return res.status(200).json(pessoasAtivas);
-        } catch (error) {
-            return res.status(500).json({ msg: ` ${error.message}Erro no servidor` });
-        }
-    }
+    /* pegaTodasAsPessoas ok */
     static async pegaTodasAsPessoas(req, res) {
         try {
-            const pessoasAtivas = await dataBase.Pessoas.scope('todos').findAll();
+            const todasPessoas = await pessoasServices.pegaTodosRegistros()
+            return res.status(200).json(todasPessoas);
+        } catch (error) {
+            return res.status(500).json({ msg: ` ${error.message}Erro no servidor` });
+        }
+    }
+    /* pegaPessoasAtivas ok */
+    static async pegaPessoasAtivas(req, res) {
+        try {
+            const pessoasAtivas = await pessoasServices.pegaRegistrosAtivos();
             return res.status(200).json(pessoasAtivas);
         } catch (error) {
             return res.status(500).json({ msg: ` ${error.message}Erro no servidor` });
         }
     }
+    /* pegaUmaPessoa ok */
     static async pegaUmaPessoa(req, res) {
         const { id } = req.params
         try {
-            const umaPessoa = await dataBase.Pessoas.findOne({ where: { id: Number(id) } });
+            const umaPessoa = await pessoasServices.pegaUmRegistro(Number(id))
             return res.status(200).json(umaPessoa)
         } catch (error) {
             return res.status(500).json({ msg: `${error.message} erro do servidor` })
         }
     }
+    /* criarPessoa ok*/
     static async criarPessoa(req, res) {
         const novaPessoa = req.body
         try {
-            const novaPessoaCriada = await dataBase.Pessoas.create(novaPessoa)
+            const novaPessoaCriada = await pessoasServices.criarRegistro(novaPessoa)
             return res.status(201).json(novaPessoaCriada)
         } catch (error) {
             return res.status(500).json({ msg: `${error.message} erro do servidor` })
         }
     }
+    /* atualizarPessoa ok*/
     static async atualizarPessoa(req, res) {
         const { id } = req.params
         const atualizarInfos = req.body
         try {
-            await dataBase.Pessoas.update(atualizarInfos, { where: { id: Number(id) } })
-            const infosAtualizada = await dataBase.Pessoas.findOne({ where: { id: Number(id) } })
+            await pessoasServices.atualizaRegistro(atualizarInfos, Number(id))
+            const infosAtualizada = await pessoasServices.pegaUmRegistro(Number(id))
             return res.status(201).json(infosAtualizada)
         } catch (error) {
             return res.status(500).json({ msg: `${error.message}` })
         }
     }
+    /* deletarPessoa ok*/
     static async deletarPessoa(req, res) {
         const { id } = req.params
         try {
-            await dataBase.Pessoas.destroy({ where: { id: Number(id) } })
+            await pessoasServices.apagaRegistro(Number(id))
             return res.status(201).json({ msg: `Dados excluído com sucesso!` })
         } catch (error) {
             return res.status(500).json({ msg: `${error.message}` })
@@ -75,12 +83,14 @@ class PessoaController {
             return res.status(500).json({ msg: `${error.message} erro do servidor` })
         }
     }
+    /* criarMatricula ok*/
     static async criarMatricula(req, res) {
         const { estudanteId } = req.params
-        const novaMatricula = { ...req.body, estudante_id: Number(estudanteId) }
+        const novaMatricula = { ...req.body, estudante_id: Number(estudanteId) }        
         try {
-            const novaMatriculaCriada = await dataBase.Matriculas.create(novaMatricula)
-            return res.status(201).json(novaMatriculaCriada)
+            await pessoasServices.adicionarPessoaMatricula(Number(estudanteId))
+            await matriculasServices.criarMatriculaPessoa(novaMatricula)
+            return res.status(201).json({msg: `Pessoa ativa e matriculada`})
         } catch (error) {
             return res.status(500).json({ msg: `${error.message} erro do servidor` })
         }
@@ -106,10 +116,11 @@ class PessoaController {
             return res.status(500).json({ msg: `${error.message}` })
         }
     }
+    /* restauraPessoa ok */
     static async restauraPessoa(req, res) {
         const { id } = req.params;
         try {
-            await dataBase.Pessoas.restore({ where: { id: Number(id) } })
+            await pessoasServices.restauraRegistro(Number(id))
             return res.status(200).json({ mensagem: `Id ${id} restaurado` })
         } catch (error) {
             return res.status(500).json(error.message)
@@ -175,25 +186,16 @@ class PessoaController {
             return res.status(500).json({ msg: `${error.message}` })
         }
     }
+    /* cancelaPessoa ok */
     static async cancelaPessoa(req, res) {
         const { estudanteId } = req.params;
-
         try {
-            dataBase.sequelize.transaction(async transacao => {
-
-                await dataBase.Pessoas.update({ ativo: false }, { where: { id: Number(estudanteId) } }, { transaction: transacao })
-
-                await dataBase.Matriculas.update({ status: 'cancelado' }, { where: { estudante_id: Number(estudanteId) } }, { transaction: transacao })
-
-                return res.status(200).json({ message: `Matricula ref. estudante ${estudanteId} canceladas` })
-
-            })
-
+            await pessoasServices.cancelaPessoaEMAtriculas(Number(estudanteId))
+            return res.status(200).json({ message: `Matricula ref. estudante ${estudanteId} canceladas` })
         } catch (error) {
             return res.status(500).json({ msg: `${error.message}` })
         }
     }
-
 }
 
 module.exports = PessoaController;

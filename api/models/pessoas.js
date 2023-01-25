@@ -1,9 +1,10 @@
 'use strict';
 module.exports = (sequelize, DataTypes) => {
   const Pessoas = sequelize.define('Pessoas', {
-    nome: {type: DataTypes.STRING,
+    nome: {
+      type: DataTypes.STRING,
       validate: {
-        funcaoValidadora: function(dado) {
+        funcaoValidadora: function (dado) {
           if (dado.length < 3) {
             throw new Error('o campo nome deve ter mais de 3 caracteres')
           }
@@ -28,7 +29,7 @@ module.exports = (sequelize, DataTypes) => {
     },
     scopes: {
       todos: { where: {} },
-      // etc: {constraint: valor }
+      // etc: {constraint: valor}
     }
   });
   Pessoas.associate = function (models) {
@@ -38,7 +39,7 @@ module.exports = (sequelize, DataTypes) => {
     })
     Pessoas.hasMany(models.Matriculas, {
       foreignKey: 'estudante_id',
-      scope: {status: 'confirmado'},
+      scope: { status: 'confirmado' },
       as: 'aulasMatriculadas'
     })
   };

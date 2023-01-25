@@ -1,13 +1,33 @@
 const dataBase = require('../models')
 
 class Services {
-    constructor(nomeDoModelo){
+    constructor(nomeDoModelo) {
         this.nomeDoModelo = nomeDoModelo
     }
-    async pegaTodosOsRegistros() {
+    async pegaTodosOsRegistros() {// ok
         return dataBase[this.nomeDoModelo].findAll()
+    }
+    async pegaUmRegistro(id) {// ok
+        return dataBase[this.nomeDoModelo].findOne({ where: { id: id } })
+    }
+    async criarRegistro(dados, transacao = {}) {// ok
+        return dataBase[this.nomeDoModelo].create(dados, transacao)
+        //
+    }
+    async atualizaRegistro(dadosAtualizados, id, transacao = {}) {// ok
+        return dataBase[this.nomeDoModelo]
+            .update(dadosAtualizados, { where: { id: id } }, transacao)
+    }
+    async atualizaRegistros(dadosAtualizados, where, transacao = {}) {//ok
+        return dataBase[this.nomeDoModelo]
+            .update(dadosAtualizados, { where: { ...where } }, transacao)
+    }
+    async apagaRegistro(id) {//ok
+        return dataBase[this.nomeDoModelo].destroy({ where: { id: id } })
+    }
+    async restauraRegistro(id){ // ok
+        return dataBase[this.nomeDoModelo].restore({ where: { id: id } })
     }
 }
 
 module.exports = Services
- 
