@@ -82,28 +82,29 @@ class PessoaController {
         const { estudanteId } = req.params
         const novaMatricula = { ...req.body, estudante_id: Number(estudanteId) }
         try {
-            await pessoasServices.adicionarPessoaMatricula(novaMatricula)
+            await pessoasServices.criarMatriculaAtivarPessoa(novaMatricula)
             return res.status(201).json({ msg: `Pessoa ativa e matriculada` })
         } catch (error) {
             return res.status(500).json({ msg: `${error.message} erro do servidor` })
         }
     }
+    /*atualizarMatricula Ok*/
     static async atualizarMatricula(req, res) {
-        const { estudanteId, matriculaId } = req.params
-        const atualizarInfos = req.body
+        const { estudanteId, matriculaId } = req.params        
+        const atualizarInfos = req.body        
         try {
-            await dataBase.Matriculas.update(atualizarInfos, { where: { id: Number(matriculaId), estudante_id: Number(estudanteId) } })
-            const matriculasAtualizada = await dataBase.Matriculas.findOne({ where: { id: Number(matriculaId) } })
+            await matriculasServices.atualizarMatricula(atualizarInfos, {id: Number(matriculaId), estudante_id: Number(estudanteId)})
+            const matriculasAtualizada = await matriculasServices.pegaUmRegistro(Number(matriculaId))
             return res.status(201).json(matriculasAtualizada)
         } catch (error) {
             return res.status(500).json({ msg: `${error.message}` })
         }
     }
+    /* deletarMatricula Ok */
     static async deletarMatricula(req, res) {
         const { estudanteid, matriculaId } = req.params
-
-        try {
-            await dataBase.Matriculas.destroy({ where: { id: Number(matriculaId) } })
+        try {            
+            await matriculasServices.apagaRegistro(Number(matriculaId))
             return res.status(201).json({ msg: `Matricula de Id: ${matriculaId} excluído com sucesso!` })
         } catch (error) {
             return res.status(500).json({ msg: `${error.message}` })
@@ -119,31 +120,31 @@ class PessoaController {
             return res.status(500).json(error.message)
         }
     }
+    /* restauraMatricula ok */
     static async restauraMatricula(req, res) {
         const { estudanteId, matriculaId } = req.params
         try {
-            await dataBase.Matriculas.restore({
-                where: {
-                    id: Number(matriculaId),
-                    estudante_id: Number(estudanteId)
-                }
-            })
+            await matriculasServices.restauraRegistroObjs({id: Number(matriculaId), estudante_id:Number(estudanteId)})
             return res.status(200).json({ mensagem: `Matricula de id ${matriculaId} restaurado` })
         } catch (error) {
             return res.status(500).json(error.message)
         }
     }
+    /* pegaMatriculas Ok */
     static async pegaMatriculas(req, res) {
         const { estudanteId } = req.params
-
         try {
-            const pessoa = await dataBase.Pessoas.findOne({ where: { id: Number(estudanteId) } })
+            const pessoa = await pessoasServices.pegaUmRegistro(Number(estudanteId))
             const matriculas = await pessoa.getAulasMatriculadas()
             return res.status(201).json(matriculas)
         } catch (error) {
             return res.status(500).json({ msg: `${error.message}` })
         }
     }
+
+
+    /* ######### Trabalhando aqui ########### */
+
     static async pegaMatriculasPorTurma(req, res) {
         const { turmaId } = req.params
 
