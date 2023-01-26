@@ -1,8 +1,7 @@
-const dataBase = require('../models');
-const { TurmasServices, NiveisServices } = require('../services')
+const { TurmasServices } = require('../services');
 const Sequelize = require('sequelize');
 const Op = Sequelize.Op;
-const turmasServices = new TurmasServices()
+const turmasServices = new TurmasServices();
 
 class TurmasController {
     /* pegaTodosAsTurmas Ok */
