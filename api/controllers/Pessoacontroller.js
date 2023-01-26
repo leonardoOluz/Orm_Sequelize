@@ -88,8 +88,7 @@ class PessoaController {
         const { estudanteId } = req.params
         const novaMatricula = { ...req.body, estudante_id: Number(estudanteId) }        
         try {
-            await pessoasServices.adicionarPessoaMatricula(Number(estudanteId))
-            await matriculasServices.criarMatriculaPessoa(novaMatricula)
+            await pessoasServices.adicionarPessoaMatricula(novaMatricula)
             return res.status(201).json({msg: `Pessoa ativa e matriculada`})
         } catch (error) {
             return res.status(500).json({ msg: `${error.message} erro do servidor` })

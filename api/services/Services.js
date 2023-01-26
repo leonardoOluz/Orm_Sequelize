@@ -14,6 +14,12 @@ class Services {
         return dataBase[this.nomeDoModelo].create(dados, transacao)
         //
     }
+    async atualizaRegistroDeDesativados(dadosAtualizados, id, transacao = {}) {// ok
+        return dataBase[this.nomeDoModelo]
+            .scope('todos')
+            .update(dadosAtualizados, { where: { id: id } }, transacao)
+    }
+
     async atualizaRegistro(dadosAtualizados, id, transacao = {}) {// ok
         return dataBase[this.nomeDoModelo]
             .update(dadosAtualizados, { where: { id: id } }, transacao)
@@ -25,7 +31,7 @@ class Services {
     async apagaRegistro(id) {//ok
         return dataBase[this.nomeDoModelo].destroy({ where: { id: id } })
     }
-    async restauraRegistro(id){ // ok
+    async restauraRegistro(id) { // ok
         return dataBase[this.nomeDoModelo].restore({ where: { id: id } })
     }
 }

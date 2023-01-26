@@ -14,7 +14,12 @@ class PessoasServices extends Services {
         return dataBase[this.nomeDoModelo].scope('todos').findAll({ where: { ...where } })
     }
     async adicionarPessoaMatricula(estudanteId) {
-        return dataBase[this.nomeDoModelo].scope('todos').update({ ativo: true }, { where: { id: estudanteId } })
+        const { estudante_id } = estudanteId
+
+        return dataBase.sequelize.transaction(async transacao => {
+            await super.atualizaRegistroDeDesativados({ ativo: true }, Number(estudante_id), { transaction: transacao })
+            await this.matriculas.criarRegistro(estudanteId, { transaction: transacao })
+        })
     }
     async cancelaPessoaEMAtriculas(estudanteId) {
 
