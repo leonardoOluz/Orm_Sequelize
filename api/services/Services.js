@@ -4,8 +4,8 @@ class Services {
     constructor(nomeDoModelo) {
         this.nomeDoModelo = nomeDoModelo
     }
-    async pegaTodosOsRegistros() {// ok
-        return dataBase[this.nomeDoModelo].findAll()
+    async pegaTodosOsRegistros(where = {}) {// ok
+        return dataBase[this.nomeDoModelo].findAll(where)
     }
     async pegaUmRegistro(id) {// ok
         return dataBase[this.nomeDoModelo].findOne({ where: { id: id } })

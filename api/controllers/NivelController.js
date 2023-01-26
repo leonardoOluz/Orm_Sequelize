@@ -1,7 +1,5 @@
-// const dataBase = require('../models');
 const Services = require('../services/Services');
 const niveisServices = new Services('Niveis');
-
 
 class NivelController {
     /* pegaTodosOsNiveis Ok */
