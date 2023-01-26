@@ -19,7 +19,6 @@ class Services {
             .scope('todos')
             .update(dadosAtualizados, { where: { id: id } }, transacao)
     }
-
     async atualizaRegistro(dadosAtualizados, id, transacao = {}) {// ok
         return dataBase[this.nomeDoModelo]
             .update(dadosAtualizados, { where: { id: id } }, transacao)

@@ -1,7 +1,7 @@
 // const Sequelize = require('sequelize');
 // const dataBase = require('../models');
 
-const {PessoasServices, MatriculasServices} = require('../services');
+const { PessoasServices, MatriculasServices } = require('../services');
 const pessoasServices = new PessoasServices()
 const matriculasServices = new MatriculasServices()
 
@@ -67,17 +67,11 @@ class PessoaController {
             return res.status(500).json({ msg: `${error.message}` })
         }
     }
+    /* pegaUmaMatricula Ok */
     static async pegaUmaMatricula(req, res) {
         const { estudanteId, matriculaId } = req.params
-        try {
-            const umaMatricula = await dataBase.Matriculas.findOne(
-                {
-                    where:
-                    {
-                        id: Number(matriculaId),
-                        estudante_id: Number(estudanteId)
-                    }
-                });
+        try {           
+            const umaMatricula = await matriculasServices.pegarMatriculaPorPessoaEMatriculaId({ id: Number(matriculaId), estudante_id: Number(estudanteId) })
             return res.status(200).json(umaMatricula)
         } catch (error) {
             return res.status(500).json({ msg: `${error.message} erro do servidor` })
@@ -86,10 +80,10 @@ class PessoaController {
     /* criarMatricula ok*/
     static async criarMatricula(req, res) {
         const { estudanteId } = req.params
-        const novaMatricula = { ...req.body, estudante_id: Number(estudanteId) }        
+        const novaMatricula = { ...req.body, estudante_id: Number(estudanteId) }
         try {
             await pessoasServices.adicionarPessoaMatricula(novaMatricula)
-            return res.status(201).json({msg: `Pessoa ativa e matriculada`})
+            return res.status(201).json({ msg: `Pessoa ativa e matriculada` })
         } catch (error) {
             return res.status(500).json({ msg: `${error.message} erro do servidor` })
         }
