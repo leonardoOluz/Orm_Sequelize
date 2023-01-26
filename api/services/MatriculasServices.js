@@ -6,7 +6,16 @@ class MatriculasServices extends Services {
         super('Matriculas')
         this.pessoas = new Services('Pessoas')
     }
-
+    async todasAsMatriculas(turmaId){
+        return await dataBase[this.nomeDoModelo].findAndCountAll({
+            where: {
+                turma_id: Number(turmaId),
+                status: 'confirmado'
+            },
+            limit: 20,
+            order: [['estudante_id', 'DESC']]
+        })
+    }
     async atualizarMatricula(atualizarInfos, dados) {
         const { estudante_id } = dados
         return dataBase.sequelize.transaction(async transacao => {

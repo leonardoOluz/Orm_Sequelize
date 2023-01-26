@@ -141,28 +141,21 @@ class PessoaController {
             return res.status(500).json({ msg: `${error.message}` })
         }
     }
-
-
-    /* ######### Trabalhando aqui ########### */
-
+    /* pegaMatriculasPorTurma Ok */
     static async pegaMatriculasPorTurma(req, res) {
         const { turmaId } = req.params
-
         try {
-            const todasAsMatriculas = await dataBase.Matriculas.findAndCountAll({
-                where: {
-                    turma_id: Number(turmaId),
-                    status: 'confirmado'
-                },
-                limit: 20,
-                order: [['estudante_id', 'DESC']]
-            })
+            const todasAsMatriculas = await matriculasServices.todasAsMatriculas(turmaId)
             return res.status(200).json(todasAsMatriculas)
-
         } catch (error) {
             return res.status(500).json({ msg: `${error.message}` })
         }
     }
+
+
+
+
+
     static async pegaTurmasLotadas(req, res) {
         const lotacaoTurma = 2;
 
